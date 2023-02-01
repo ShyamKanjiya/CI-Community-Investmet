@@ -1,0 +1,72 @@
+.carousel-inner img {
+    width: 100%;
+}
+
+#RegisterBtn {
+    border-radius: 50px;
+    border: 2px solid #F88634;
+    background-color: white;
+    color: #F88634;
+    height: 48px;
+    font-size: 20px;
+    margin-top: 40px;
+}
+
+.form-group {
+    font-size: 22px;
+    font-family: 'Segoe UI';
+}
+
+#staticNames {
+    color: #414141;
+    padding-bottom: 10px;
+    font-size: 20px;
+}
+
+.lostNewAcc{
+    position: relative;
+    margin-top: 17px;
+    text-align: center;
+}
+
+#InputName{
+    height: 48px;
+}
+
+#InputLName{
+    height: 48px;
+}
+
+#InputNumber{
+    height: 48px;
+}
+
+#InputEmail{
+    height: 48px;    
+}
+
+#InputPassword{
+    height: 48px;
+}
+
+#InputCheckPassword{
+    height: 48px;
+}
+
+#newPass{
+    margin-top: 15px;
+}
+
+@media screen and (max-width : 991px) {
+    .row{
+        margin-top: 10px;
+    }
+
+    .carousel-inner img{
+        margin-left: 30px;
+    }
+
+    #form{
+        margin-left: 30px;
+    }
+}
