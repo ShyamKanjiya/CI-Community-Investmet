@@ -244,7 +244,7 @@ determine whether any of the existing customers have placed an order or not -
 
 SELECT cust_name, customer.city, ord_no, ord_date, purch_amt AS [Order Amount]
 FROM orders
-LEFT OUTER JOIN customer ON customer.customer_id = orders.customer_id 
+INNER JOIN customer ON customer.customer_id = orders.customer_id 
 ORDER BY ord_date;
 
 
