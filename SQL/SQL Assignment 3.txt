@@ -1,0 +1,104 @@
+------------------------------------------------------------------------------------------------
+Assignment 3 : Retrieve data using Group By clause
+------------------------------------------------------------------------------------------------
+
+Sample table1:Department
+-dept_id
+-dept_name
+
+Sample table2: Employee
+-emp_id
+-dept_id
+-mngr_id
+-emp_name
+-salary
+
+
+WORK :- 
+
+Creating "Departmet and Employee" table -
+
+CREATE TABLE Department(
+	dept_id INT NOT NULL PRIMARY KEY,
+	dept_name VARCHAR(20) NOT NULL
+);
+
+
+CREATE TABLE Employee(
+	emp_id INT NOT NULL PRIMARY KEY,
+	dept_id INT NOT NULL FOREIGN KEY REFERENCES Department(dept_id),
+	mngr_id INT NOT NULL,
+	emp_name VARCHAR(15) NOT NULL,
+	salary DECIMAL(10,2) NOT NULL,
+);
+
+
+INSERT queries -
+
+INSERT INTO Department VALUES 
+	(01,'CE' ),
+	(02,'IT' ),
+	(03,'HR' ),
+	(04,'R&D')
+
+INSERT INTO Employee VALUES 
+	( 01 , 04 , 00 ,'KAYLING'  , 6000.00 ),
+	( 02 , 02 , 01 ,'BLAZE'    , 2750.00 ),
+	( 03 , 03 , 01 ,'CLARE'    , 2550.00 ),
+	( 04 , 04 , 01 ,'JONAS'    , 2957.00 ),
+	( 05 , 01 , 01 ,'SCARLET'  , 3100.00 ),
+	( 07 , 04 , 04 ,'SANDRINE' ,  900.00 ),
+	( 08 , 02 , 04 ,'ADELYN'   , 1700.00 ),
+	( 09 , 02 , 04 ,'WADE'     , 1350.00 ),
+	( 10 , 02 , 04 ,'MADDEN'   , 1350.00 ),
+	( 11 , 03 , 01 ,'TUCKER'   , 1600.00 ),
+	( 12 , 01 , 02 ,'ADNRES'   , 1200.00 ),
+	( 13 , 01 , 03 ,'JULIUS'   , 1050.00 ),
+	( 14 , 01 , 01 ,'MARKER'   , 1400.00 )
+
+
+QUERIES :-
+
+Show all data - 
+
+SELECT * FROM Department;
+SELECT * FROM Employee;
+
+
+Q 1
+Write a SQL query to find Employees who have the biggest salary in their Department -
+
+SELECT emp_id, emp_name, salary AS [MAX SALART], Employee.dept_id,
+dept_name
+FROM Employee
+INNER JOIN Department ON Department.dept_id = Employee.dept_id
+WHERE salary IN
+(SELECT MAX(salary) From Employee GROUP BY dept_id)  
+
+
+Q 2
+Write a SQL query to find Departments that have less than 3 people in it -
+
+SELECT Department.dept_id,dept_name, COUNT(emp_id) AS Employees
+FROM Department
+JOIN Employee ON Employee.dept_id = Department.dept_id
+GROUP BY dept_name, Department.dept_id 
+Having COUNT(emp_id) < 3
+
+
+Q 3
+Write a SQL query to find All Department along with the number of people there -
+
+SELECT Department.dept_name, COUNT(emp_id) AS [people in department]
+FROM Employee
+RIGHT JOIN Department ON Department.dept_id = Employee.dept_id
+GROUP BY Department.dept_name
+
+
+Q 4
+Write a SQL query to find All Department along with the total salary there - 
+
+SELECT dept_name, Employee.dept_id, SUM(salary) AS [Total salary of department]
+FROM Employee
+RIGHT JOIN Department ON Employee.dept_id = Department.dept_id
+GROUP BY dept_name,Employee.dept_id
