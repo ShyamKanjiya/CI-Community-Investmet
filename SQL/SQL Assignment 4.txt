@@ -1,0 +1,166 @@
+--------------------------------------------------------------------------------------------------------------------------
+Assignment 4 : Create Stored procedure in Northwind database to insert or update a
+record in a table
+--------------------------------------------------------------------------------------------------------------------------
+
+
+QUERIES :-
+
+Q 1
+Create a stored procedure in the Northwind database that will calculate the average value of Freight for a specified customer.Then, a business rule will be added that will 
+be triggered before every Update and Insert command in the Orders controller,and will use the stored procedure to verify that the Freight does not exceed the average
+freight. If it does, a message will be displayed and the command will be cancelled -
+
+CREATE PROC smInsertUpdateOrders
+
+@OrderID  INT,
+@CustomerID NCHAR(5),
+@EmployeeID INT,
+@OrderDate DATETIME,
+@RequiredDate DATETIME,
+@ShippedDate DATETIME,
+@ShipVia INT,
+@Freight MONEY,
+@ShipName NVARCHAR(40),
+@ShipAddress NVARCHAR(60),
+@ShipCity NVARCHAR(15),
+@ShipRegion NVARCHAR(15),
+@ShipPostalCode NVARCHAR(10),
+@ShipCountry NVARCHAR(15),
+@type NVARCHAR(7)
+
+AS
+
+BEGIN
+	DECLARE @AvgFreight MONEY 
+	
+	SELECT @AvgFreight = AVG(Freight) FROM Orders
+	WHERE CustomerID = @CustomerID 
+	GROUP BY CustomerID
+
+	IF(@AvgFreight < @Freight)
+		BEGIN
+			RAISERROR('Operation denied due to Average Freight Condition.',10,1)
+		END
+	ELSE
+		BEGIN
+			
+			IF(@type = 'INSERT')
+				BEGIN
+					INSERT INTO Orders(OrderID, CustomerID, EmployeeID, OrderDate, RequiredDate, ShippedDate, ShipVia, Freight, ShipName, ShipAddress, ShipCity, ShipRegion, ShipPostalCode, ShipCountry)
+					VALUES (@OrderID, @CustomerID, @EmployeeID, @OrderDate, @RequiredDate, @ShippedDate, @ShipVia, @Freight, @ShipName, @ShipAddress, @ShipCity, @ShipRegion, @ShipPostalCode, @ShipCountry)
+				END
+			ELSE
+				BEGIN
+					UPDATE Orders SET
+					  CustomerID = @CustomerID, EmployeeID = @EmployeeID, 
+					  OrderDate = @OrderDate, RequiredDate = @RequiredDate, ShippedDate = @ShippedDate, 
+					  ShipVia = @ShipVia, Freight = @Freight, ShipName = @ShipName, 
+					  ShipAddress = @ShipAddress, ShipCity = @ShipCity, ShipRegion = @ShipRegion, 
+					  ShipPostalCode = @ShipPostalCode, ShipCountry = @ShipCountry
+					WHERE OrderID = @OrderID
+				END
+		END
+END
+
+SET IDENTITY_INSERT Orders ON
+
+
+Q 2
+Write a SQL query to Create Stored procedure in the Northwind database to retrieve Employee Sales by Country -
+
+CREATE PROC smEmployeeSalesByCountry
+@StartDate Date,
+@EndDate Date
+AS
+
+BEGIN
+	SELECT Employees.Country, SUM([Order Details].Quantity * [Order Details].UnitPrice) AS [Total Price]
+	FROM Employees
+	INNER JOIN Orders ON Employees.EmployeeID = Orders.EmployeeID
+	INNER JOIN [Order Details] ON [Order Details].OrderID = Orders.OrderID
+	WHERE Orders.OrderDate BETWEEN @StartDate AND @EndDate
+	GROUP BY Employees.Country
+END
+
+
+Q 3
+Write a SQL query to Create Stored procedure in the Northwind database to retrieve Sales by Year -
+
+CREATE PROC smSalesByYear
+@Year INT
+AS
+
+BEGIN
+	SELECT YEAR(OrderDate) AS [Year], SUM([Order Details].Quantity * [Order Details].UnitPrice) AS [Total Price]
+	FROM Orders
+	INNER JOIN [Order Details] ON [Order Details].OrderID = Orders.OrderID
+	WHERE YEAR(OrderDate) = @Year
+	GROUP BY YEAR(OrderDate)
+END
+
+
+Q 4
+Write a SQL query to Create Stored procedure in the Northwind database to retrieve Sales By Category -
+
+ALTER PROC smSalesByCategory
+@Category VARCHAR(20)
+AS
+
+BEGIN
+	SELECT Categories.CategoryID, Categories.CategoryName, SUM([Order Details].Quantity * [Order Details].UnitPrice) AS [Total Price]
+	FROM Categories
+	INNER JOIN Products ON Categories.CategoryID = Products.CategoryID
+	INNER JOIN [Order Details] ON [Order Details].ProductID = Products.ProductID
+	WHERE Categories.CategoryName = @Category
+	GROUP BY Categories.CategoryName, Categories.CategoryID
+END
+
+
+Q 5
+Write a SQL query to Create Stored procedure in the Northwind database to retrieve Ten Most Expensive Products -
+
+CREATE PROC smMostExpensiveProduct
+AS
+
+BEGIN
+	SELECT TOP 10 ProductName, UnitPrice
+	FROM Products
+	ORDER BY UnitPrice DESC
+END
+
+
+Q 6
+Write a SQL query to Create Stored procedure in the Northwind database to insert Customer Order Details -
+
+CREATE PROC smInsertOrderDetails
+@OrderID INT,
+@ProductID INT,
+@UnitPrice MONEY,
+@Quantity SMALLINT,
+@Discount REAL
+AS
+
+BEGIN
+	INSERT INTO [Order Details]
+	(OrderID, ProductID, UnitPrice, Quantity, Discount) VALUES 
+	(@OrderID, @ProductID, @UnitPrice, @Quantity,@Discount)
+END
+
+
+Q 7
+Write a SQL query to Create Stored procedure in the Northwind database to update Customer Order Details -
+
+CREATE PROC smUpdateOrderDetails
+@OrderID INT,
+@ProductID INT,
+@UnitPrice MONEY,
+@Quantity SMALLINT,
+@Discount REAL
+AS
+
+BEGIN
+	UPDATE [Order Details]
+	SET UnitPrice = @UnitPrice, Quantity = @Quantity, Discount =  @Discount
+	WHERE OrderID = @OrderID AND ProductID = @ProductID
+END
